@@ -7,7 +7,7 @@ if(!isset($_GET['k']) && $_GET['k'] !== "r56rf7gyh87g86guyb86f57jhbguy9h98hbyutc
 if(!isset($_POST['zips']) && !isset($_GET['zip'])){
 
     ?>
-    <form action="/shlomylev/?k=<?php echo $_GET['k']; ?>" method="post">
+    <form action="?k=<?php echo $_GET['k']; ?>" method="post">
 Zip code:
 <pre>
 85014
@@ -83,11 +83,10 @@ else {
     }
 
     $max = 400;
-
     if($count <= $max){
         $count++;
         $date =  (isset($_GET['date']) ? $_GET['date'] : $start) + (3600*24);
-        echo '<h1>In Progress: ' . $count . ' (Go get some coffee... ' . ($max - $count) . ' more to go)</h1><script>parent.location = "' .  "/shlomylev/?k=" . $_GET['k'] . "&date=" . $date . "&count=" . $count . "&zip=" . $zip        . '";</script>';
+        echo '<h1>In Progress: ' . $count . ' (Go get some coffee... ' . ($max - $count) . ' more to go)</h1><script>parent.location = "' . "?k=" . $_GET['k'] . "&date=" . $date . "&count=" . $count . "&zip=" . $zip        . '";</script>';
         die();
     }
     else{
