@@ -1,0 +1,114 @@
+<?php
+ 
+if(!isset($_GET['k']) && $_GET['k'] !== "r56rf7gyh87g86guyb86f57jhbguy9h98hbyutc6r7870"){
+    die();
+}
+ 
+if(!isset($_POST['zips']) || !isset($_POST['dates'])){
+ 
+    ?>
+    <form action="?k=<?php echo $_GET['k']; ?>" method="post">
+NON US CHABAD.org CODE:
+<pre>
+85014
+91020
+11213
+</pre>
+        <br />
+        <textarea name="zips" cols="50" rows="20" placeholder="Paste ChabadORG Code Here"></textarea>
+ 
+        <br />
+        <br />
+        <br />
+<pre>
+Dates:
+</pre>
+        <br />
+        <textarea name="dates" cols="50" rows="20" placeholder="Paste dates here">
+09/12/2018
+12/18/2018
+03/20/2019
+4/19/2019
+7/21/2019
+8/10/2019
+8/11/2019
+</textarea>
+        <input type="submit" value="Go get em'" />
+    </form>
+<?php
+ 
+ 
+}
+else {
+ 
+    $zips = explode("\n", $_POST['zips']);
+    $dates = explode("\n", $_POST['dates']);
+ 
+    function getZmanim($zip, $date){
+        //print_r('http://www.chabad.org/tools/rss/zmanim.xml?locationId=' . $zip . '&locationType=1&tdate=' . $date);
+        return file_get_contents('http://www.chabad.org/tools/rss/zmanim.xml?locationId=' . $zip . '&locationType=1&tdate=' . $date);
+    }
+ 
+    function getFastTimes($zmanim){
+        preg_match('/Fast Begins - ([0-9]{1,}:[0-9]{1,} [A|P]M)/', $zmanim, $matches);
+        $start = isset($matches[1]) ? $matches[1] : "";
+ 
+        preg_match('/Fast Ends - ([0-9]{1,}:[0-9]{1,} [A|P]M)/', $zmanim, $matches);
+        $end = isset($matches[1]) ? $matches[1] : "";
+ 
+        return (object) array("start" => $start, "end" => $end);
+    }
+ 
+    function getPesachTimes($zmanim){
+        preg_match('/Finish Eating Chametz before - ([0-9]{1,}:[0-9]{1,} [A|P]M)/', $zmanim, $matches);
+        $finish_eating = isset($matches[1]) ? $matches[1] : "";
+ 
+        preg_match('/Sell and Burn Chametz before - ([0-9]{1,}:[0-9]{1,} [A|P]M)/', $zmanim, $matches);
+        $sell_burn = isset($matches[1]) ? $matches[1] : "";
+ 
+        return (object) array("finish_eating" => $finish_eating, "sell_burn" => $sell_burn);
+    }
+ 
+    $times = array();
+    foreach($zips as $zip){
+        foreach($dates as $date){
+            $zip = trim($zip);
+            $date = trim($date);
+            $zmanim = getZmanim($zip, $date);
+            $fast_times = getFastTimes($zmanim);
+            if(!empty($fast_times->start)){
+                $times[] = array(
+                    $zip, $date, "fast starts", $fast_times->start,
+                );
+            }
+            if(!empty($fast_times->end)){
+            $times[] = array(
+                $zip, $date, "fast ends", $fast_times->end,
+            );
+            }
+ 
+            $pesach_times = getPesachTimes($zmanim);
+            if(!empty($pesach_times->finish_eating)){
+                $times[] = array(
+                    $zip, $date, "finish eating chametz by", $pesach_times->finish_eating,
+                );
+            }
+            if(!empty($pesach_times->sell_burn)){
+                $times[] = array(
+                    $zip, $date, "sell and burn chametz by", $pesach_times->sell_burn,
+                );
+            }
+        }
+    }
+ 
+    $file = "zmanim_" . time() . ".csv";
+    $link = fopen($file, "w");
+    fputcsv($link, array("zip", "date", "info", "time"));
+    foreach($times as $time){
+        fputcsv($link, $time);
+    }
+    fclose($link);
+    echo '<a href="' . $file .'">DOWNLOAD</a>';
+ 
+ 
+}                       
