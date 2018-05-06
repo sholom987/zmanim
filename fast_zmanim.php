@@ -108,7 +108,10 @@ else {
         fputcsv($link, $time);
     }
     fclose($link);
-    echo '<a href="' . $file .'">DOWNLOAD</a>';
+    header('Content-type: application/csv');
+    header("Content-Disposition: inline; filename=".$file);
+    readfile($file);
+    unlink($file);
  
  
 }                       
