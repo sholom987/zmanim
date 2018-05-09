@@ -6,10 +6,12 @@ if(!isset($_GET['k']) && $_GET['k'] !== "r56rf7gyh87g86guyb86f57jhbguy9h98hbyutc
 $heb_cal_dates_json = json_decode(file_get_contents('http://www.hebcal.com/hebcal/?v=1&cfg=json&mf=on&year=now&geo=zip&zip=33319&c=0&m=0&maj=on&min=on'));
 $hebcal_items = $heb_cal_dates_json -> {'items'};
 $hebcal_fast_title = array("sdfgsdfgsdfgsdfgsdfg", "Erev Tish'a B'Av", "Tish'a B'Av", "Yom Kippur", "Erev Yom Kippur");
-$fast_dates = array();
+$cl_dates = array();
+$g=0;
 foreach ($hebcal_items as $key => $value) {
-    if((array_key_exists('subcat', $value) && $value -> {'subcat'}  == 'fast') || array_search($value -> {'title'}, $hebcal_fast_title, true)){
-        array_push($fast_dates, $value);
+    if(strpos($value -> {'title'}, 'Candle lighting') !== false && $g < 5) {
+        array_push($cl_dates, $value);
+        $g++;
     }
 }
 if(!isset($_POST['zips']) && !isset($_GET['zip'])){
@@ -46,7 +48,7 @@ else {
         return file_get_contents('http://www.chabad.org/tools/rss/zmanim.xml?locationId=' . $zip . '&locationType=2&tdate=' . $date);
     }
 
-    function getAllTimes($zmanim, $fast_date){
+    function getAllTimes($zmanim, $cl_date){
         global $headers;
         $reg_ex = "/title>(.+)\-.+?([0-9]{1,}:[0-9]{1,} [A|P]M).+?--.+?([0-9]{1,}\/[0-9]{1,}\/[0-9]{1,}).+?<\/title/";
         preg_match_all($reg_ex, $zmanim, $matches);
@@ -55,26 +57,30 @@ else {
         $times = $matches[2];
         $dates = $matches[3];
         $resp = array();
-        $resp["date"] = $fast_date -> {'date'};
-        $resp["title"] = $fast_date -> {'title'};
+        var_dump($days);
+        $resp["date"] = $cl_date -> {'date'};
         foreach($dates as $key => $date){
-            if(!in_array($days[$key], $headers)){
+            if(!in_array($days[$key], $headers) && trim($days[$key]) == "Candle Lighting"){
                 $headers[$days[$key]] = $days[$key];
+                continue;
             }
-            $resp[$days[$key]] = $times[$key];
+            $lighting_index = array_search("Candle Lighting ", $days);
+            if($lighting_index > -1) {
+                $resp[$days[$lighting_index]] = $times[$lighting_index];
+            }
         }
 
         return $resp;
     }
     $times = array();
     $count=0;
-    foreach($fast_dates as $fast_date) {
+    foreach($cl_dates as $cl_date) {
         $zip = trim($zip);
         $file_name = md5($zip.$count++) . ".part";
         if(!file_exists($file_name)){
-            $date = date_create($fast_date -> {'date'}) -> format("m/d/Y");
+            $date = date_create($cl_date -> {'date'}) -> format("m/d/Y");
             $zmanim = getZmanim($zip, $date);
-            $all_times = getAllTimes($zmanim, $fast_date);
+            $all_times = getAllTimes($zmanim, $cl_date);
             $link = fopen($file_name, "w");
             fwrite($link, serialize($all_times));
             fclose($link);
@@ -108,9 +114,10 @@ else {
         fputcsv($link, $time);
     }
     fclose($link);
-    header('Content-type: application/csv');
-    header("Content-Disposition: inline; filename=".$file);
-    readfile($file);
-    unlink($file);
+    //header('Content-type: application/csv');
+    //header("Content-Disposition: inline; filename=".$file);
+   //readfile($file);
+    //unlink($file);
+    echo '<a href="' . $file .'">DOWNLOAD</a>';
 
 }						
