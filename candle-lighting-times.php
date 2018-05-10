@@ -5,7 +5,7 @@ $headers = [];
 $set_date_col = true;
 if($zip_codes != null) {
     foreach ($zip_codes as $zip) {
-        $csv_rows = explode("\n", file_get_contents("https://www.chabad.org/calendar/candlelighting/candlelighting.csv.asp?locationId=" . $zip . "&locationType=2&tdate=1/1/2018&weeks=60"));
+        $csv_rows = explode("\n", file_get_contents("https://www.chabad.org/calendar/candlelighting/candlelighting.csv.asp?aid=6226&locationId=" . $zip . "&locationType=2&tdate=9/1/" . (date("Y")-1) ."&weeks=52"));
         if($set_date_col) {
             add_dates_col($csv_rows);
             $set_date_col = false;
