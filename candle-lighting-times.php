@@ -5,7 +5,7 @@ $headers = [];
 $set_date_col = true;
 if($zip_codes != null) {
     foreach ($zip_codes as $zip) {
-        $csv_rows = explode("\n", file_get_contents("https://www.chabad.org/calendar/candlelighting/candlelighting.csv.asp?aid=6226&locationId=" . $zip . "&locationType=2&tdate=" . $_POST['tdate'] ."&weeks=52"));
+        $csv_rows = explode("\n", file_get_contents("https://www.chabad.org/calendar/candlelighting/candlelighting.csv.asp?aid=6226&locationId=" . $zip . "&locationType=2&tdate=" . $_POST['tdate'] ."&weeks=" . $_POST['weeks'] ));
         if($set_date_col) {
             add_dates_col($csv_rows);
             $set_date_col = false;
@@ -17,9 +17,10 @@ if($zip_codes != null) {
     <h1>Candle Lighting Times By Zip Code</h1>
     <form method="post" action="">
         <textarea name="zips" cols="50" rows="20" placeholder="Enter A Coma Delimited List Of Zip Codes Like 11213,33319,90278"></textarea><br /><br />
-        <lable for="tdate">Start Date <input id="tdate" name="tdate" type="text" value="9/1/<?php echo date("Y") ?>"></input></lable><br /><br />
-        <lable for="start_times">Get Start Times<input id="start_times" name="start_times" type="checkbox" checked></input></lable><br /><br />
-        <lable for="end_times">Get End Times<input id="end_times" name="end_times" type="checkbox"></input></lable><br /><br />
+        <label for="weeks">Start Date <input id="weeks" name="weeks" type="text" value="65"></input></label><br /><br />
+        <label for="tdate">Start Date <input id="tdate" name="tdate" type="text" value="9/1/<?php echo date("Y") ?>"></input></label><br /><br />
+        <label for="start_times">Get Start Times<input id="start_times" name="start_times" type="checkbox" checked></input></label><br /><br />
+        <label for="end_times">Get End Times<input id="end_times" name="end_times" type="checkbox"></input></label><br /><br />
         <input type="submit" value="Retrieve Candle Lighting Times" />
     </form>
 <?php     
