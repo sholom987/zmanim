@@ -5,7 +5,7 @@ $headers = [];
 $set_date_col = true;
 if($zip_codes != null) {
     foreach ($zip_codes as $zip) {
-        $csv_rows = explode("\n", file_get_contents("https://www.chabad.org/calendar/candlelighting/candlelighting.csv.asp?aid=6226&locationId=" . $zip . "&locationType=2&tdate=9/1/" . (date("Y")-1) ."&weeks=52"));
+        $csv_rows = explode("\n", file_get_contents("https://www.chabad.org/calendar/candlelighting/candlelighting.csv.asp?aid=6226&locationId=" . $zip . "&locationType=2&tdate=" . $_POST['tdate'] ."&weeks=52"));
         if($set_date_col) {
             add_dates_col($csv_rows);
             $set_date_col = false;
@@ -17,9 +17,24 @@ if($zip_codes != null) {
     <h1>Candle Lighting Times By Zip Code</h1>
     <form method="post" action="">
         <textarea name="zips" cols="50" rows="20" placeholder="Enter A Coma Delimited List Of Zip Codes Like 11213,33319,90278"></textarea><br /><br />
+        <lable for="tdate">Start Date <input id="tdate" name="tdate" type="text" value="9/1/<?php echo date("Y") ?>"></input></lable><br /><br />
+        <lable for="start_times">Get Start Times<input id="start_times" name="start_times" type="checkbox" checked></input></lable><br /><br />
+        <lable for="end_times">Get End Times<input id="end_times" name="end_times" type="checkbox"></input></lable><br /><br />
         <input type="submit" value="Retrieve Candle Lighting Times" />
     </form>
 <?php     
+}
+
+function check_row($row) {
+    return array_key_exists(1, $row) && array_key_exists(2, $row) && array_key_exists(3, $row);
+}
+
+function is_start_time($row) {
+    return isset($_POST['start_times']) && $_POST['start_times'] && strpos($row[3], 'Candle') !== false;
+}
+
+function is_end_time($row) {
+    return isset($_POST['end_times']) && $_POST['end_times'] && strpos($row[3], 'Ends') !== false;
 }
 
 function add_zip_time_col($row_array, $zip) {
@@ -29,7 +44,7 @@ function add_zip_time_col($row_array, $zip) {
     $i = 0;
     foreach($row_array as $row) {
         $row = str_getcsv($row);
-        if (array_key_exists(1, $row) && array_key_exists(2, $row) && array_key_exists(3, $row) && strpos($row[3], 'Candle') !== false) {
+        if (check_row($row) && (is_start_time($row) || is_end_time($row))) {
             array_push($to_csv[$i], $row[2]);
             $i++;
         }
@@ -42,7 +57,7 @@ function add_dates_col($row_array) {
     $headers[] = 'Dates';
     foreach($row_array as $row) {
         $row = str_getcsv($row);
-        if (array_key_exists(1, $row) && array_key_exists(2, $row) && array_key_exists(3, $row) && strpos($row[3], 'Candle') !== false) {
+        if (check_row($row) && (is_start_time($row) || is_end_time($row))) {
             $to_csv[] = array(0 => trim(strstr($row[1], ' ', false)));
         }
     }
