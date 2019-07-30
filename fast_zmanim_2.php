@@ -1,8 +1,4 @@
 <?php
-
-if(!isset($_GET['k']) && $_GET['k'] !== "r56rf7gyh87g86guyb86f57jhbguy9h98hbyutc6r7870"){
-    die();
-}
 $heb_cal_dates_json = json_decode(file_get_contents('http://www.hebcal.com/hebcal/?v=1&cfg=json&mf=on&year=now&geo=zip&zip=33319&c=0&m=0&maj=on&min=on'));
 $hebcal_items = $heb_cal_dates_json -> {'items'};
 $hebcal_fast_title = array("sdfgsdfgsdfgsdfgsdfg", "Erev Tish'a B'Av", "Tish'a B'Av", "Yom Kippur", "Erev Yom Kippur");

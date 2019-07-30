@@ -1,9 +1,5 @@
 <?php
 
-if(!isset($_GET['k']) && $_GET['k'] !== "r56rf7gyh87g86guyb86f57jhbguy9h98hbyutc6r7870"){
-    die();
-}
-
 if(!isset($_POST['zips']) && !isset($_GET['zip'])){
 
     ?>

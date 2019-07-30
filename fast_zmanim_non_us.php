@@ -1,9 +1,5 @@
 <?php
  
-if(!isset($_GET['k']) && $_GET['k'] !== "r56rf7gyh87g86guyb86f57jhbguy9h98hbyutc6r7870"){
-    die();
-}
- 
 if(!isset($_POST['zips']) || !isset($_POST['dates'])){
  
     ?>
@@ -25,13 +21,14 @@ Dates:
 </pre>
         <br />
         <textarea name="dates" cols="50" rows="20" placeholder="Paste dates here">
-09/12/2018
-12/18/2018
-03/20/2019
-4/19/2019
-7/21/2019
-8/10/2019
-8/11/2019
+10/02/2019
+1/7/2020
+03/9/2020
+4/8/2020
+7/09/2020
+7/29/2020
+7/30/2020
+9/21/2020
 </textarea>
         <input type="submit" value="Go get em'" />
     </form>
